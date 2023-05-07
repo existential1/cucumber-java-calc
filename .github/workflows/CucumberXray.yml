@@ -1,0 +1,109 @@
+
+ 
+
+# This is a basic workflow to help you get started with Actions
+
+name: Cucumber CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up Java
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+    - name: Cache Maven packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+    - name: Build with Maven
+      run: mvn -X -B package --f Cuke/pom.xml
+  test_1:
+    runs-on: ubuntu-latest
+    outputs:
+      tx_key: ${{ steps.test_ex_key.outputs.tx_key }}
+      xml_file: ${{ steps.xray_sub.outputs.xmlfile }}
+    steps:
+      - uses: actions/checkout@v1
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+      - name: Build with Maven
+        run: mvn test --f Cuke/pom.xml -Dtest=Cuke/RunCucumberTest
+      - name: Get Xray Cloud API token
+        env:
+          CLIENT_ID: ${{ secrets.client_id }}
+          CLIENT_SECRET: ${{ secrets.client_secret }}
+        id: xray-token
+        run: |
+          echo "XRAY_TOKEN=$(curl -H "Content-Type: application/json" -X POST --data "{ \"client_id\": \"$CLIENT_ID\",\"client_secret\": \"$CLIENT_SECRET\" }" https://xray.cloud.getxray.app/api/v1/authenticate| tr -d '"')" >> "$GITHUB_OUTPUT"
+          # echo ::set-output name=XRAY_TOKEN::$(curl -H "Content-Type: application/json" -X POST --data "{ \"client_id\": \"$CLIENT_ID\",\"client_secret\": \"$CLIENT_SECRET\" }" https://xray.cloud.getxray.app/api/v1/authenticate| tr -d '"')
+      
+      - name: Check file existence
+        id: check_files
+        uses: andstor/file-existence-action@v2
+        with:
+          files: "Cuke/logs/test.json"
+
+      - name: File exists
+        id: file_exists
+        if: steps.check_files.outputs.files_exists == 'true'
+        # Only runs if all of the files exists
+        run: | 
+          echo The json file exists
+          
+      #- name: Print file
+      #  id: print_file
+      #  run: |
+      #    content=`cat Cuke/logs/test.json`
+      #    #"file_content = $content" >> "GITHUB_OUTPUT"
+      #    echo I is past file exists
+      
+      #- name: Import results to Xray
+      #  id: import_results
+      #  uses: mikepenz/xray-action@v2.4.5
+      #  with:
+      #    username: ${{ secrets.CLIENT_ID }}
+      #    password: ${{ secrets.CLIENT_SECRET }}
+      #    testFormat: "cucumber"
+      #    testPaths: "Cuke/logs/*.json"
+      #    projectKey: "TES"
+          
+      # - name: Print Key
+      #  run: |
+      #    echo "tx_key=${{ steps.import_results.outputs.testExecKey }}" >> "GITHUB_OUTPUT"
+      #    echo $tx_key
+        
+      - name: Submit results to Xray
+        id:  xray_sub
+        run: |
+          echo "TX_KEY=$(curl -H "Content-Type: application/json" -X POST -H "Authorization: Bearer ${{ steps.xray-token.outputs.XRAY_TOKEN }}" --data @Cuke/logs/test.json  "https://xray.cloud.getxray.app/api/v2/import/execution/cucumber")" >> "$GITHUB_OUTPUT"
+          # echo ${{ steps.xray_sub.outputs.TX_KEY }}
+      - name: Get Xray Test Execution Key
+        id: test_ex_key
+        run: |
+          echo "tx_key=${{ steps.xray_sub.outputs.TX_KEY }}" >> "$GITHUB_OUTPUT"
