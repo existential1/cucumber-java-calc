@@ -117,12 +117,12 @@ jobs:
       #    echo "tx_key=${{ steps.import_results.outputs.testExecKey }}" >> "GITHUB_OUTPUT"
       #    echo $tx_key
         
-      #- name: Submit results to Xray
-      #  id:  xray_sub
-      #  run: |
-      #    echo "TX_KEY=$(curl -H "Content-Type: application/json" -X POST -H "Authorization: Bearer ${{ steps.xray-token.outputs.XRAY_TOKEN }}" --data @report.json  "https://xray.cloud.getxray.app/api/v2/import/execution/cucumber")" >> "$GITHUB_OUTPUT"
-      #    # echo ${{ steps.xray_sub.outputs.TX_KEY }}
-      #- name: Get Xray Test Execution Key
-      #  id: test_ex_key
-      #  run: |
-      #    echo "tx_key=${{ steps.xray_sub.outputs.TX_KEY }}" >> "$GITHUB_OUTPUT"
+      - name: Submit results to Xray
+        id:  xray_sub
+        run: |
+          echo "TX_KEY=$(curl -H "Content-Type: application/json" -X POST -H "Authorization: Bearer ${{ steps.xray-token.outputs.XRAY_TOKEN }}" --data @report.json  "https://xray.cloud.getxray.app/api/v2/import/execution/cucumber")" >> "$GITHUB_OUTPUT"
+          # echo ${{ steps.xray_sub.outputs.TX_KEY }}
+      - name: Get Xray Test Execution Key
+        id: test_ex_key
+        run: |
+          echo "tx_key=${{ steps.xray_sub.outputs.TX_KEY }}" >> "$GITHUB_OUTPUT"
