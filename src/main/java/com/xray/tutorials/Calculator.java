@@ -25,9 +25,9 @@ public static double Add(double num1, double num2 )
 public static int Multiply(int num1, int num2 )
 {
     if (num1==0) {
-        return num2;
+        return 0; //num2
     } else if (num2==0) {
-        return num1;
+        return 0; //num1;
     } else {
         return num1 * num2;
     }
