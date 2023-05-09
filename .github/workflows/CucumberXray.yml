@@ -1,6 +1,3 @@
-
- 
-
 # This is a basic workflow to help you get started with Actions
 
 name: Cucumber CI
@@ -53,7 +50,10 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
       - name: Build with Maven
-        run: mvn test --f Cuke/pom.xml -Dtest=Cuke/RunCucumberTest
+        #run: mvn test --f Cuke/pom.xml -Dtest=Cuke/RunCucumberTest
+        run: |
+          mvn test --f Cuke/pom.xml -Dcucumber.plugin="json:report.json" -Dcucumber.features="src/test/resources/Hello/Cuke/"
+          
       - name: Get Xray Cloud API token
         env:
           CLIENT_ID: ${{ secrets.client_id }}
@@ -63,18 +63,38 @@ jobs:
           echo "XRAY_TOKEN=$(curl -H "Content-Type: application/json" -X POST --data "{ \"client_id\": \"$CLIENT_ID\",\"client_secret\": \"$CLIENT_SECRET\" }" https://xray.cloud.getxray.app/api/v1/authenticate| tr -d '"')" >> "$GITHUB_OUTPUT"
           # echo ::set-output name=XRAY_TOKEN::$(curl -H "Content-Type: application/json" -X POST --data "{ \"client_id\": \"$CLIENT_ID\",\"client_secret\": \"$CLIENT_SECRET\" }" https://xray.cloud.getxray.app/api/v1/authenticate| tr -d '"')
       
-      - name: Check file existence
-        id: check_files
-        uses: andstor/file-existence-action@v2
-        with:
-          files: "Cuke/logs/test.json"
-
-      - name: File exists
-        id: file_exists
-        if: steps.check_files.outputs.files_exists == 'true'
-        # Only runs if all of the files exists
+      #- name: export_features_to_xray
+      #  id: exportftx
+      #  run: |
+      #    echo "EXP_OP = $(curl -H "Content-Type: multipart/form-data" -X POST -H "Authorization: Bearer ${{ steps.xray-token.outputs.XRAY_TOKEN }}" -F "file=@Cuke/src/test/resources/Hello/Cuke/example.feature" https://xray.cloud.getxray.app/api/v1/import/feature?projectKey=TES)" >> "GITHUB_OUTPUT"
+      #- name: Print exp_feat_curl_response
+      #  id: prt_exp_feat
+      #  run: |
+      #   echo Rtn from features $EXP_OP
+         
+      - name: import_features from_xray
+        id: importffx
         run: | 
-          echo The json file exists
+          echo $(curl -H "Content-Type: application/json" -X GET -H "Authorization: Bearer ${{ steps.xray-token.outputs.XRAY_TOKEN }}"  "https://xray.cloud.getxray.app/api/v2/export/cucumber?keys=TES-48")
+      
+      #- name: Check file existence
+      #  id: check_files
+      #  uses: andstor/file-existence-action@v2
+      #  with:
+      #    files: "Cuke/report.json"
+
+      #- name: File exists
+      #  id: file_exists
+      #  if: steps.check_files.outputs.files_exists == 'true'
+      #  # Only runs if all of the files exists
+      #  run: | 
+      #    echo The json file exists
+          
+      - name: Print file
+        id: print_file
+        run: |
+          content=`cat Cuke/report.json`
+          echo $content
           
       #- name: Print file
       #  id: print_file
@@ -98,12 +118,12 @@ jobs:
       #    echo "tx_key=${{ steps.import_results.outputs.testExecKey }}" >> "GITHUB_OUTPUT"
       #    echo $tx_key
         
-      - name: Submit results to Xray
-        id:  xray_sub
-        run: |
-          echo "TX_KEY=$(curl -H "Content-Type: application/json" -X POST -H "Authorization: Bearer ${{ steps.xray-token.outputs.XRAY_TOKEN }}" --data @Cuke/logs/test.json  "https://xray.cloud.getxray.app/api/v2/import/execution/cucumber")" >> "$GITHUB_OUTPUT"
-          # echo ${{ steps.xray_sub.outputs.TX_KEY }}
-      - name: Get Xray Test Execution Key
-        id: test_ex_key
-        run: |
-          echo "tx_key=${{ steps.xray_sub.outputs.TX_KEY }}" >> "$GITHUB_OUTPUT"
+      #- name: Submit results to Xray
+      #  id:  xray_sub
+      #  run: |
+      #    echo "TX_KEY=$(curl -H "Content-Type: application/json" -X POST -H "Authorization: Bearer ${{ steps.xray-token.outputs.XRAY_TOKEN }}" --data @Cuke/logs/test.json  "https://xray.cloud.getxray.app/api/v2/import/execution/cucumber")" >> "$GITHUB_OUTPUT"
+      #    # echo ${{ steps.xray_sub.outputs.TX_KEY }}
+      #- name: Get Xray Test Execution Key
+      #  id: test_ex_key
+      #  run: |
+      #    echo "tx_key=${{ steps.xray_sub.outputs.TX_KEY }}" >> "$GITHUB_OUTPUT"
