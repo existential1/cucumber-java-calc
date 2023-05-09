@@ -52,7 +52,7 @@ jobs:
       - name: Build with Maven
         
         run: |
-          mvn test --f pom.xml -Dcucumber.plugin="json:logs/report.json" -Dcucumber.features="src/test/resources/Hello/Cuke/"
+          mvn test --f pom.xml -Dcucumber.plugin="json:report.json" -Dcucumber.features="src/test/resources/calculator"
           
       - name: Get Xray Cloud API token
         env:
@@ -65,7 +65,7 @@ jobs:
       #- name: export_features_to_xray
       #  id: exportftx
       #  run: |
-      #    echo "EXP_OP = $(curl -H "Content-Type: multipart/form-data" -X POST -H "Authorization: Bearer ${{ steps.xray-token.outputs.XRAY_TOKEN }}" -F "file=@cucumber-java-calc/src/test/resources/Hello/Cuke/example.feature" https://xray.cloud.getxray.app/api/v1/import/feature?projectKey=TES)" >> "GITHUB_OUTPUT"
+      #    echo "EXP_OP = $(curl -H "Content-Type: multipart/form-data" -X POST -H "Authorization: Bearer ${{ steps.xray-token.outputs.XRAY_TOKEN }}" -F "file=@cucumber-java-calc/src/test/resources/calculator/example.feature" https://xray.cloud.getxray.app/api/v1/import/feature?projectKey=TES)" >> "GITHUB_OUTPUT"
       #- name: Print exp_feat_curl_response
       #  id: prt_exp_feat
       #  run: |
@@ -80,7 +80,7 @@ jobs:
       #  id: check_files
       #  uses: andstor/file-existence-action@v2
       #  with:
-      #    files: "cucumber-java-calc/logs/report.json"
+      #    files: "report.json"
 
       #- name: File exists
       #  id: file_exists
@@ -92,13 +92,13 @@ jobs:
       - name: Print file
         id: print_file
         run: |
-          content=`cat cucumber-java-calc/report.json`
+          content=`cat report.json`
           echo $content
           
       #- name: Print file
       #  id: print_file
       #  run: |
-      #    content=`cat cucumber-java-calc/logs/report.json`
+      #    content=`cat report.json`
       
       #    echo $content
       
@@ -109,7 +109,7 @@ jobs:
       #    username: ${{ secrets.CLIENT_ID }}
       #    password: ${{ secrets.CLIENT_SECRET }}
       #    testFormat: "cucumber"
-      #    testPaths: "cucumber-java-calc/logs/*.json"
+      #    testPaths: "*.json"
       #    projectKey: "TES"
           
       # - name: Print Key
@@ -120,7 +120,7 @@ jobs:
       #- name: Submit results to Xray
       #  id:  xray_sub
       #  run: |
-      #    echo "TX_KEY=$(curl -H "Content-Type: application/json" -X POST -H "Authorization: Bearer ${{ steps.xray-token.outputs.XRAY_TOKEN }}" --data @cucumber-java-calc/logs/report.json  "https://xray.cloud.getxray.app/api/v2/import/execution/cucumber")" >> "$GITHUB_OUTPUT"
+      #    echo "TX_KEY=$(curl -H "Content-Type: application/json" -X POST -H "Authorization: Bearer ${{ steps.xray-token.outputs.XRAY_TOKEN }}" --data @report.json  "https://xray.cloud.getxray.app/api/v2/import/execution/cucumber")" >> "$GITHUB_OUTPUT"
       #    # echo ${{ steps.xray_sub.outputs.TX_KEY }}
       #- name: Get Xray Test Execution Key
       #  id: test_ex_key
