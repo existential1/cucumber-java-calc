@@ -30,7 +30,7 @@ jobs:
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
         restore-keys: ${{ runner.os }}-m2
     - name: Build with Maven
-      run: mvn -X -B package --f cucumber-java-calc/pom.xml
+      run: mvn -X -B package --f pom.xml
   test_1:
     runs-on: ubuntu-latest
     outputs:
@@ -52,7 +52,7 @@ jobs:
       - name: Build with Maven
         
         run: |
-          mvn test --f cucumber-java-calc/pom.xml -Dcucumber.plugin="json:logs/report.json" -Dcucumber.features="src/test/resources/Hello/Cuke/"
+          mvn test --f pom.xml -Dcucumber.plugin="json:logs/report.json" -Dcucumber.features="src/test/resources/Hello/Cuke/"
           
       - name: Get Xray Cloud API token
         env:
