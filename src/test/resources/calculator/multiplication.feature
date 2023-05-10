@@ -2,7 +2,7 @@
 @TEST_TES-53
 Feature:  As a user, I can multiply two numbers
 
-@id:1 @TES-53
+@id:1 @TES-52
 Scenario: simple integer multiplication
         Given I have entered 3 into the calculator
         And I have entered 0 into the calculator
