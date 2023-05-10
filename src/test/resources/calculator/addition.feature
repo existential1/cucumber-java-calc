@@ -1,5 +1,5 @@
 #@REQ_CALC-7931
-@REQ_CALC-640
+@TEST_TES-48
 Feature:  As a user, I can add two numbers
 
 @id:1
