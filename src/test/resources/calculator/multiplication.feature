@@ -1,5 +1,5 @@
 #@REQ_CALC-7935
-@TEST_TES-53
+
 Feature:  As a user, I can multiply two numbers
 
 @id:1 @TES-52
