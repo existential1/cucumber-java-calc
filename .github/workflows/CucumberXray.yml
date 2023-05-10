@@ -62,14 +62,14 @@ jobs:
         run: |
           echo "XRAY_TOKEN=$(curl -H "Content-Type: application/json" -X POST --data "{ \"client_id\": \"$CLIENT_ID\",\"client_secret\": \"$CLIENT_SECRET\" }" https://xray.cloud.getxray.app/api/v1/authenticate| tr -d '"')" >> "$GITHUB_OUTPUT"
          
-      #- name: export_features_to_xray
-      #  id: exportftx
-      #  run: |
-      #    echo "EXP_OP = $(curl -H "Content-Type: multipart/form-data" -X POST -H "Authorization: Bearer ${{ steps.xray-token.outputs.XRAY_TOKEN }}" -F "file=@cucumber-java-calc/src/test/resources/calculator/example.feature" https://xray.cloud.getxray.app/api/v1/import/feature?projectKey=TES)" >> "GITHUB_OUTPUT"
-      #- name: Print exp_feat_curl_response
-      #  id: prt_exp_feat
-      #  run: |
-      #   echo Rtn from features $EXP_OP
+      - name: export_features_to_xray
+        id: exportftx
+        run: |
+          echo "EXP_OP = $(curl -H "Content-Type: multipart/form-data" -X POST -H "Authorization: Bearer ${{ steps.xray-token.outputs.XRAY_TOKEN }}" -F "file=@src/test/resources/calculator/multiplication.feature" https://xray.cloud.getxray.app/api/v1/import/feature?projectKey=TES)" >> "GITHUB_OUTPUT"
+      - name: Print exp_feat_curl_response
+        id: prt_exp_feat
+        run: |
+         echo Rtn from features ${{ steps.exportftx.outputs.EXP_OP }}
          
       - name: import_features from_xray
         id: importffx
