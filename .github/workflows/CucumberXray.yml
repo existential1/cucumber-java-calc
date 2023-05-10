@@ -71,10 +71,10 @@ jobs:
         run: |
          echo Rtn from features ${{ steps.exportftx.outputs.EXP_OP }}
          
-      #- name: import_features from_xray
-      #  id: importffx
-      #  run: | 
-      #    echo $(curl -H "Content-Type: application/json" -X GET -H "Authorization: Bearer ${{ steps.xray-token.outputs.XRAY_TOKEN }}"  "https://xray.cloud.getxray.app/api/v2/export/cucumber?keys=TES-48")
+      - name: import_features from_xray
+        id: importffx
+        run: | 
+          echo $(curl -H "Content-Type: application/json" -X GET -H "Authorization: Bearer ${{ steps.xray-token.outputs.XRAY_TOKEN }}"  "https://xray.cloud.getxray.app/api/v2/export/cucumber?keys=TES-48")
       
       #- name: Check file existence
       #  id: check_files
