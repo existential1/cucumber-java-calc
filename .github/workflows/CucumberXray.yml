@@ -65,7 +65,7 @@ jobs:
       - name: export_features_to_xray
         id: exportftx
         run: |
-          echo "EXP_OP = $(curl -H "Content-Type: multipart/form-data" -X POST -H "Authorization: Bearer ${{ steps.xray-token.outputs.XRAY_TOKEN }}" -F "file=@src/test/resources/calculator/addition.feature" https://xray.cloud.getxray.app/api/v1/import/feature?projectKey=TES)" >> "GITHUB_OUTPUT"
+          echo "EXP_OP = $(curl -H "Content-Type: multipart/form-data" -X POST -H "Authorization: Bearer ${{ steps.xray-token.outputs.XRAY_TOKEN }}" -F "file=@src/test/resources/calculator/multiplication.feature" https://xray.cloud.getxray.app/api/v1/import/feature?projectKey=TES)" >> "GITHUB_OUTPUT"
       - name: Print exp_feat_curl_response
         id: prt_exp_feat
         run: |
