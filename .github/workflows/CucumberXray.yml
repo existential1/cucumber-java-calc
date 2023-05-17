@@ -125,4 +125,4 @@ jobs:
       - name: Get Xray Test Execution Key
         id: test_ex_key
         run: |
-          echo "tx_key=${{ steps.xray_sub.outputs.TX_KEY }}" >> "$GITHUB_OUTPUT"
+          echo "tx_key=${{fromJson(steps.xray_sub.outputs.TX_KEY).key}}" >> "$GITHUB_OUTPUT"
